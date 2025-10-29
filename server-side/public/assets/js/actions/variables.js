@@ -1,5 +1,5 @@
 export const paths = {
-    apiPath: 'https://roadify-api.thelinuxchoice.com/api',
+    apiPath: 'https://roadify.thelinuxchoice.com/api',
 }
 
 export const endpoints = {

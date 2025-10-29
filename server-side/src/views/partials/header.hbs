@@ -82,9 +82,8 @@
                                 <div class="flex-shrink-0 position-relative">
                                     <img class="rounded-circle admin-img-width-for-mobile user-avatar" 
                                         style="width: 40px; height: 40px; object-fit: cover;" 
-                                        :src="$store.currentUser.avatar || '/assets/images/default-avatar.png'" 
-                                        alt="admin"
-                                        @error="$el.src='/assets/images/default-avatar.png'">
+                                        :src="$store.currentUser.avatar" 
+                                        alt="admin">
                                 </div>
                             </div>
 
@@ -93,9 +92,8 @@
                                     <div class="flex-shrink-0">
                                         <img class="rounded-circle admin-img-width-for-mobile user-avatar"
                                             style="width: 40px; height: 40px; object-fit: cover;" 
-                                            :src="$store.currentUser.avatar || '/assets/images/default-avatar.png'"
-                                            alt="admin"
-                                            @error="$el.src='/assets/images/default-avatar.png'">
+                                            :src="$store.currentUser.avatar"
+                                            alt="admin">
                                     </div>
                                     <div class="flex-grow-1 ms-10">
                                         <h3 class="fw-medium fs-17 mb-0" x-text="$store.currentUser.full_name || 'Usuario'"></h3>
