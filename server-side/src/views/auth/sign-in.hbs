@@ -81,11 +81,16 @@
                                     </div>
 
                                     <div class="mb-4">
-                                        <div x-text="error.non_field_errors" class="text-danger text-center mb-4" x-show="error.non_field_errors.length > 0"></div>
+                                        <div x-text="error.non_field_errors" class="text-danger text-center mb-4" x-show="error.non_field_errors?.length > 0"></div>
                                         <div class="text-success text-center mb-4" x-text="success" x-show="success"></div>
 
                                         <button type="button" class="btn btn-primary fw-normal text-white w-100"
-                                            style="padding-top: 18px; padding-bottom: 18px;" @click="login">Iniciar Sesión</button>
+                                            style="padding-top: 18px; padding-bottom: 18px;" @click="login">
+                                            <span x-show="!loading">Iniciar Sesión</span>
+                                            <span x-show="loading">
+                                                <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                                            </span> 
+                                        </button>
                                     </div>
 
                                 </form>

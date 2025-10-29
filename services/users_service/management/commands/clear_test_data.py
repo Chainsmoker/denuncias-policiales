@@ -32,9 +32,9 @@ class Command(BaseCommand):
                 return
         
         deleted_denuncias = Denuncia.objects.all().delete()[0]
-        self.stdout.write(self.style.SUCCESS(f'✓ Eliminadas {deleted_denuncias} denuncias'))
+        self.stdout.write(self.style.SUCCESS(f'Eliminadas {deleted_denuncias} denuncias'))
         
         deleted_users = User.objects.filter(is_superuser=False).delete()[0]
-        self.stdout.write(self.style.SUCCESS(f'✓ Eliminados {deleted_users} usuarios'))
+        self.stdout.write(self.style.SUCCESS(f'Eliminados {deleted_users} usuarios'))
         
-        self.stdout.write(self.style.SUCCESS(f'\n✓ Base de datos limpiada exitosamente'))
+        self.stdout.write(self.style.SUCCESS(f'\nBase de datos limpiada exitosamente'))

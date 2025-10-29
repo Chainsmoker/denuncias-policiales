@@ -17,7 +17,7 @@ class DashboardStatsView(APIView):
         total_users = User.objects.count()
         
         recent_incidents = Denuncia.objects.select_related('user').order_by('-created_at')[:5]
-        recent_incidents_serializer = DenunciaListSerializer(recent_incidents, many=True)
+        recent_incidents_serializer = DenunciaListSerializer(recent_incidents, many=True, context={'request': request})
 
         status_stats = {
             'pending': Denuncia.objects.filter(status='Pending').count(),
@@ -107,7 +107,7 @@ class DashboardUserStatsView(APIView):
         total_incidents = Denuncia.objects.filter(user=user).count()
         
         recent_incidents = Denuncia.objects.filter(user=user).order_by('-created_at')[:5]
-        recent_incidents_serializer = DenunciaListSerializer(recent_incidents, many=True)
+        recent_incidents_serializer = DenunciaListSerializer(recent_incidents, many=True, context={'request': request})
         
         status_stats = {
             'pending': Denuncia.objects.filter(user=user, status='Pending').count(),
@@ -116,11 +116,11 @@ class DashboardUserStatsView(APIView):
         }
         
         today = datetime.now()
-        six_months_ago = today - timedelta(days=180)
+        twelve_months_ago = today - timedelta(days=365)
         
         monthly_data = (
             Denuncia.objects
-            .filter(user=user, created_at__gte=six_months_ago)
+            .filter(user=user, created_at__gte=twelve_months_ago)
             .annotate(month=TruncMonth('created_at'))
             .values('month')
             .annotate(count=Count('id'))
@@ -140,6 +140,21 @@ class DashboardUserStatsView(APIView):
                 'x': month_names[month_num],
                 'y': item['count']
             })
+        
+        if len(chart_data) < 12:
+            all_months = {}
+            for i in range(12):
+                date = today - timedelta(days=30 * i)
+                month_key = month_names[date.month]
+                all_months[month_key] = 0
+            
+            for item in chart_data:
+                all_months[item['x']] = item['y']
+            
+            chart_data = [
+                {'x': month_names[((today.month - 11 + i) % 12) or 12], 'y': all_months.get(month_names[((today.month - 11 + i) % 12) or 12], 0)}
+                for i in range(12)
+            ]
         
         return Response({
             'total_incidents': total_incidents,

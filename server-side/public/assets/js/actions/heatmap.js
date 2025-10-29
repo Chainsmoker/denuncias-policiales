@@ -30,7 +30,7 @@ class Heatmap extends ApiClient {
         const features = denuncias.map(d => {
             return new ol.Feature({
                 geometry: new ol.geom.Point(ol.proj.fromLonLat([d.lon, d.lat])),
-                weight: 1.0
+                weight: d.peso
             });
         });
 

@@ -2,6 +2,7 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser
 from django.db.models import Q
 from core.pagination import CustomPageNumberPagination
 from .models import User
@@ -113,20 +114,21 @@ class MyProfileView(APIView):
         from denuncias_service.serializers import DenunciaListSerializer
         
         user = request.user
-        
-        user_serializer = UserProfileSerializer(user)
-        
+
+        user_serializer = UserProfileSerializer(user, context={'request': request})
+
         recent_denuncias = Denuncia.objects.filter(user=user).order_by('-created_at')[:5]
         denuncias_serializer = DenunciaListSerializer(recent_denuncias, many=True)
         
         return Response({
             'user': user_serializer.data,
-            'recent_denuncias': denuncias_serializer.data,
+            'recent_incidents': denuncias_serializer.data,
         })
 
 class UpdateMyProfileView(generics.UpdateAPIView):
     serializer_class = UserProfileUpdateSerializer
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
     
     def get_object(self):
         return self.request.user
@@ -134,6 +136,13 @@ class UpdateMyProfileView(generics.UpdateAPIView):
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
+        
+        if request.data.get('remove_avatar') == 'true':
+            if instance.avatar and instance.avatar.name != 'defaults/users/default.jpg':
+                instance.avatar.delete(save=False)
+                instance.avatar = 'defaults/users/default.jpg'
+                instance.save()
+        
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)

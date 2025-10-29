@@ -142,6 +142,9 @@
                                         Esta acción no se puede deshacer.
                                     </p>
                                 </div>
+                                <div class="col-lg-12 mb-4 text-center">
+                                    <span class="text-danger" x-text="error.non_field_errors"></span>
+                                </div>
                                 <div class="modal-footer border-0">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                                     <button type="button" class="btn btn-danger" @click="confirmDelete" :disabled="deleting">
@@ -382,7 +385,9 @@
                                     </form>
                                 </div>
 
-                                <span x-text="error.non_field_errors" class="text-danger text-center"></span>
+                                <div class="col-lg-12 mb-4 text-center">
+                                    <span class="text-danger" x-text="error.non_field_errors"></span>
+                                </div>
 
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">

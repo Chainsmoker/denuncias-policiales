@@ -65,11 +65,11 @@ class Command(BaseCommand):
                 created_users += 1
                 
                 if (i + 1) % 10 == 0:
-                    self.stdout.write(self.style.SUCCESS(f'  Creados {i + 1}/{count} usuarios...'))
+                    self.stdout.write(self.style.SUCCESS(f'Creados {i + 1}/{count} usuarios...'))
                     
             except Exception as e:
                 self.stdout.write(self.style.ERROR(f'  Error creando usuario {i + 1}: {str(e)}'))
                 continue
         
-        self.stdout.write(self.style.SUCCESS(f'\n✓ Se crearon exitosamente {created_users} usuarios'))
+        self.stdout.write(self.style.SUCCESS(f'\nSe crearon exitosamente {created_users} usuarios'))
         self.stdout.write(self.style.WARNING(f'  Contraseña para todos: password123'))

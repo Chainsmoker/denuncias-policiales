@@ -13,7 +13,7 @@
             {{> header }}
             <div class="main-content-container overflow-hidden">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div :class="$store.currentUser.is_superuser ? 'col-md-6' : 'col-md-12'">
                         <div class="card bg-white p-20 rounded-10 border border-white mb-4">
                             <div class="d-flex">
                                 <div class="flex-grow-1">
@@ -32,7 +32,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6" x-show="$store.currentUser.is_superuser">
                         <div class="card bg-white p-20 rounded-10 border border-white mb-4">
                             <div class="d-flex">
                                 <div class="flex-grow-1">
@@ -78,61 +78,43 @@
                                             <tr>
                                                 <th scope="col" class="fw-medium">ID</th>
                                                 <th scope="col" class="fw-medium">Usuario</th>
-                                                <th scope="col" class="fw-medium">Distrito</th>
-                                                <th scope="col" class="fw-medium">Tipo</th>
-                                                <th scope="col" class="fw-medium">Estado</th>
                                                 <th scope="col" class="fw-medium">Fecha</th>
-                                                <th scope="col" class="fw-medium">Acciones</th>
+                                                <th scope="col" class="fw-medium">Tipo</th>
+                                                <th scope="col" class="fw-medium">Descripción</th>
+                                                <th scope="col" class="fw-medium">Distrito</th>
+                                                <th scope="col" class="fw-medium">Estado</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <template x-for="report in data.recent_incidents" :key="report.id">
+                                            <template x-for="incident in data.recent_incidents" :key="incident.id">
                                                 <tr>
-                                                    <td class="text-body" x-text="`#${report.id}`"></td>
+                                                    <td class="text-body" x-text="`#${incident.id}`"></td>
                                                     <td>
-                                                        <a :href="`/dashboard/users/${report.user_id}`"
+                                                        <a href="javascript:void(0);"
                                                             class="d-flex align-items-center text-decoration-none">
                                                             <div class="flex-shrink-0">
-                                                                <img src="assets/images/user1.jpg"
-                                                                    class="rounded-circle"
+                                                                <img :src="incident.avatar" class="rounded-circle"
                                                                     style="width: 50px; height: 50px;" alt="user1">
                                                             </div>
                                                             <div class="flex-grow-1 ms-12">
                                                                 <h3 class="fw-medium hover-text mb-0 fs-16"><span
-                                                                        x-text="report.user_name"></span></h3>
+                                                                        x-text="incident.full_name ? incident.full_name : 'N/A'"></span></h3>
                                                             </div>
                                                         </a>
                                                     </td>
-                                                    <td class="text-body" x-text="report.district"></td>
-                                                    <td class="text-body" x-text="report._type_display"></td>
+                                                    <td class="text-secondary" x-text="formatDate(incident.created_at)">
+                                                    </td>
+                                                    <td class="text-body" x-text="getTypeText(incident._type)"></td>
+                                                    <td class="text-body">
+                                                        <span
+                                                            x-text="incident.description.length > 50 ? incident.description.substring(0, 50) + '...' : incident.description"></span>
+                                                    </td>
+                                                    <td class="text-body" x-text="incident.district"></td>
                                                     <td>
                                                         <span
-                                                            class="bg-opacity-10 fs-15 fw-normal d-inline-block default-badge"
-                                                            :class="{
-                                                                'bg-warning text-warning': report.status === 'Pending',
-                                                                'bg-info text-info': report.status === 'In Progress',
-                                                                'bg-success text-success': report.status === 'Resolved'
-                                                            }"
-                                                            x-text="report.status === 'Pending' ? 'Pendiente' : report.status === 'Resolved' ? 'Resuelta' : 'En proceso'"></span>
-                                                    </td>
-                                                    <td class="text-body"
-                                                        x-text="new Date(report.created_at).toLocaleDateString()"></td>
-                                                    <td>
-                                                        <div class="d-flex justify-content-end" style="gap: 12px;">
-                                                            <button class="bg-transparent p-0 border-0"
-                                                                data-bs-toggle="tooltip" data-bs-placement="top"
-                                                                data-bs-title="Ver">
-                                                                <i
-                                                                    class="material-symbols-outlined fs-16 fw-normal text-primary">visibility</i>
-                                                            </button>
-                                                            <button
-                                                                class="bg-transparent p-0 border-0 hover-text-danger"
-                                                                data-bs-toggle="tooltip" data-bs-placement="top"
-                                                                data-bs-title="Eliminar">
-                                                                <i
-                                                                    class="material-symbols-outlined fs-16 fw-normal text-body">delete</i>
-                                                            </button>
-                                                        </div>
+                                                            :class="`${getStatusBadgeClass(incident.status)} bg-opacity-10 fs-15 fw-normal d-inline-block default-badge`"
+                                                            x-text="getStatusText(incident.status)">
+                                                        </span>
                                                     </td>
                                                 </tr>
                                             </template>

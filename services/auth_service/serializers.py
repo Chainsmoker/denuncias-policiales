@@ -40,7 +40,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         fields = [
             'dni', 'email', 'password', 'password_confirm',
             'first_name', 'last_name', 'phone',
-            'region', 'distrito', 'address', 'gender'
+            'region', 'distrito', 'address', 'gender',
         ]
         extra_kwargs = {
             'first_name': {'required': False, 'allow_blank': True},

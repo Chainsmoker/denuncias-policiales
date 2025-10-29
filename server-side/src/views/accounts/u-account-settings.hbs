@@ -3,12 +3,30 @@
 
 <head>
     {{>head}}
+    <style>
+        .avatar-preview-container {
+            transition: all 0.3s ease;
+        }
+        .avatar-preview-container:hover img {
+            transform: scale(1.05);
+        }
+        .avatar-preview-container img {
+            transition: transform 0.3s ease;
+        }
+        .avatar-upload-area {
+            transition: all 0.3s ease;
+        }
+        .avatar-upload-area:hover {
+            border-color: #0f79f3 !important;
+            background-color: #f0f9ff;
+        }
+    </style>
 </head>
 
 <body class="bg-body-bg">
     {{>preloader}}
     {{>sidebar}}
-    <div class="container-fluid">
+    <div class="container-fluid" x-data="profile">
         <div class="main-content d-flex flex-column">
             {{>header}}
 
@@ -54,14 +72,16 @@
                         <p class="fs-16 lh-1-8">Actualiza tu foto y detalles personales aquí.</p>
                     </div>
 
-                    <form>
+                    <form @submit.prevent="updateProfile">
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="mb-20">
                                     <label class="label fs-16 mb-2">Nombres</label>
                                     <div class="form-floating">
-                                        <input type="text" class="form-control" id="floatingInput1" value="Juaneco">
+                                        <input type="text" class="form-control" id="floatingInput1"
+                                            :value="data.user.first_name" x-model="userForm.first_name">
                                         <label for="floatingInput1">Nombres</label>
+                                        <span class="text-danger" x-text="error.first_name"></span>
                                     </div>
                                 </div>
                             </div>
@@ -69,8 +89,10 @@
                                 <div class="mb-20">
                                     <label class="label fs-16 mb-2">Apellidos</label>
                                     <div class="form-floating">
-                                        <input type="text" class="form-control" id="floatingInput2" value="Perez">
+                                        <input type="text" class="form-control" id="floatingInput2"
+                                            :value="data.user.last_name" x-model="userForm.last_name">
                                         <label for="floatingInput2">Apellidos</label>
+                                        <span class="text-danger" x-text="error.last_name"></span>
                                     </div>
                                 </div>
                             </div>
@@ -79,8 +101,9 @@
                                     <label class="label fs-16 mb-2">Correo Electrónico</label>
                                     <div class="form-floating">
                                         <input type="text" class="form-control" id="floatingInput3"
-                                            value="juancitoperez@gmail.com">
+                                            :value="data.user.email" x-model="userForm.email">
                                         <label for="floatingInput3">Correo Electrónico</label>
+                                        <span class="text-danger" x-text="error.email"></span>
                                     </div>
                                 </div>
                             </div>
@@ -89,8 +112,9 @@
                                     <label class="label fs-16 mb-2">Teléfono</label>
                                     <div class="form-floating">
                                         <input type="text" class="form-control" id="floatingInput4"
-                                            value="972384756">
+                                            :value="data.user.phone" x-model="userForm.phone">
                                         <label for="floatingInput4">Teléfono</label>
+                                        <span class="text-danger" x-text="error.phone"></span>
                                     </div>
                                 </div>
                             </div>
@@ -99,8 +123,9 @@
                                     <label class="label fs-16 mb-2">DNI</label>
                                     <div class="form-floating">
                                         <input type="text" class="form-control" id="floatingInput4"
-                                            value="12345678">
+                                            :value="data.user.dni" :disabled="true">
                                         <label for="floatingInput4">DNI</label>
+                                        <span class="text-danger" x-text="error.dni"></span>
                                     </div>
                                 </div>
                             </div>
@@ -109,13 +134,36 @@
                                     <label class="label fs-16 mb-2">Región</label>
                                     <div class="form-floating">
                                         <select class="form-select form-control" id="floatingSelect8"
-                                            aria-label="Floating label select example">
-                                            <option selected>Lima</option>
-                                            <option value="1">Arequipa</option>
-                                            <option value="2">Ayacucho</option>
-                                            <option value="2">Cusco</option>
+                                            aria-label="Floating label select example" :x-model="userForm.region">
+                                            <option value="">Seleccionar...</option>
+                                            <option value="Amazonas">Amazonas</option>
+                                            <option value="Ancash">Ancash</option>
+                                            <option value="Apurimac">Apurímac</option>
+                                            <option value="Arequipa">Arequipa</option>
+                                            <option value="Ayacucho">Ayacucho</option>
+                                            <option value="Cajamarca">Cajamarca</option>
+                                            <option value="Callao">Callao</option>
+                                            <option value="Cusco">Cusco</option>
+                                            <option value="Huancavelica">Huancavelica</option>
+                                            <option value="Huanuco">Huánuco</option>
+                                            <option value="Ica">Ica</option>
+                                            <option value="Junin">Junín</option>
+                                            <option value="La Libertad">La Libertad</option>
+                                            <option value="Lambayeque">Lambayeque</option>
+                                            <option value="Lima">Lima</option>
+                                            <option value="Loreto">Loreto</option>
+                                            <option value="Madre de Dios">Madre de Dios</option>
+                                            <option value="Moquegua">Moquegua</option>
+                                            <option value="Pasco">Pasco</option>
+                                            <option value="Piura">Piura</option>
+                                            <option value="Puno">Puno</option>
+                                            <option value="San Martin">San Martín</option>
+                                            <option value="Tacna">Tacna</option>
+                                            <option value="Tumbes">Tumbes</option>
+                                            <option value="Ucayali">Ucayali</option>
                                         </select>
                                         <label for="floatingInput5">Región</label>
+                                        <span class="text-danger" x-text="error.region"></span>
                                     </div>
                                 </div>
                             </div>
@@ -123,9 +171,9 @@
                                 <div class="mb-20">
                                     <label class="label fs-16 mb-2">Distrito</label>
                                     <div class="form-floating">
-                                        <input type="text" class="form-control" id="floatingInput6"
-                                            value="Comas">
+                                        <input type="text" class="form-control" id="floatingInput6" :value="data.user.distrito" x-model="userForm.distrito">
                                         <label for="floatingInput6">Distrito</label>
+                                        <span class="text-danger" x-text="error.distrito"></span>
                                     </div>
                                 </div>
                             </div>
@@ -134,8 +182,9 @@
                                     <label class="label fs-16 mb-2">Dirección</label>
                                     <div class="form-floating">
                                         <input type="text" class="form-control" id="floatingInput6"
-                                            value="Av. Universitaria 2445">
+                                            :value="data.user.address" x-model="userForm.address">
                                         <label for="floatingInput6">Dirección</label>
+                                        <span class="text-danger" x-text="error.address"></span>
                                     </div>
                                 </div>
                             </div>
@@ -144,12 +193,13 @@
                                     <label class="label fs-16 mb-2">Género</label>
                                     <div class="form-floating">
                                         <select class="form-select form-control" id="floatingSelect8"
-                                            aria-label="Floating label select example">
+                                            aria-label="Floating label select example" x-model="userForm.gender">
                                             <option selected>Seleccionar</option>
-                                            <option value="2">Femenino</option>
-                                            <option value="2">Masculino</option>
+                                            <option value="female">Femenino</option>
+                                            <option value="male">Masculino</option>
                                         </select>
                                         <label for="floatingSelect8">Seleccionar</label>
+                                        <span class="text-danger" x-text="error.gender"></span>
                                     </div>
                                 </div>
                             </div>
@@ -160,32 +210,81 @@
                                 </div>
                             </div>
                             <div class="col-lg-12">
-                                <div class="form-group mb-4 only-file-upload" id="file-upload">
-                                    <div class="form-control h-100 text-center position-relative p-4 p-lg-5">
-                                        <div class="product-upload">
-                                            <label class="file-upload mb-0">
-                                                <i
-                                                    class="ri-folder-image-line bg-primary bg-opacity-10 p-2 rounded-1 text-primary"></i>
-                                                <span class="d-block text-body fs-14">Arrastra y suelta una imagen o <span
-                                                        class="text-primary text-decoration-underline">Explorar</span></span>
-                                            </label>
-                                            <label class="position-absolute top-0 bottom-0 start-0 end-0 cursor"
-                                                id="upload-container">
-                                                <input class="form__file bottom-0" id="upload-files" type="file"
-                                                    multiple="multiple">
-                                            </label>
+                                <div class="mb-4">
+                                    <div class="d-flex align-items-center gap-3 mb-3" x-show="avatarPreview || data.user.avatar">
+                                        <div class="position-relative">
+                                            <img :src="avatarPreview || data.user.avatar || '/assets/images/default-avatar.png'" 
+                                                alt="Avatar" 
+                                                class="rounded-circle" 
+                                                style="width: 120px; height: 120px; object-fit: cover; border: 3px solid #e5e7eb;">
+                                            <button type="button" 
+                                                @click="removeAvatar()" 
+                                                class="btn btn-danger btn-sm position-absolute"
+                                                style="top: 0; right: 0; border-radius: 50%; width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;"
+                                                x-show="avatarPreview || (data.user.avatar && data.user.avatar !== '/media/defaults/default-avatar.png')">
+                                                <i class="ri-close-line" style="font-size: 18px;"></i>
+                                            </button>
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-1" x-text="data.user.first_name + ' ' + data.user.last_name"></h5>
+                                            <p class="text-muted mb-0 fs-14" x-show="!avatarPreview && data.user.avatar">Foto actual</p>
+                                            <p class="text-success mb-0 fs-14" x-show="avatarPreview">
+                                                <i class="ri-check-line me-1"></i>Nueva foto seleccionada
+                                            </p>
                                         </div>
                                     </div>
-                                    <div id="files-list-container"></div>
+
+                                    <div class="form-control h-100 text-center position-relative p-4 p-lg-5 avatar-upload-area" 
+                                        x-show="!avatarPreview && !data.user.avatar"
+                                        style="border: 2px dashed #dee2e6; border-radius: 10px; cursor: pointer;"
+                                        @click="$refs.avatarInput.click()">
+                                        <div class="product-upload">
+                                            <i class="ri-image-add-line bg-primary bg-opacity-10 p-3 rounded-circle text-primary mb-3" style="font-size: 48px;"></i>
+                                            <p class="d-block text-body fs-16 mb-2">Arrastra y suelta una imagen o</p>
+                                            <span class="text-primary text-decoration-underline fs-16">Haz clic para explorar</span>
+                                            <p class="text-muted mt-3 mb-0 fs-14">Formatos: JPG, PNG, GIF, WEBP (Máx. 5MB)</p>
+                                        </div>
+                                    </div>
+
+                                    <button type="button" 
+                                        class="btn btn-outline-primary mt-3" 
+                                        @click="$refs.avatarInput.click()"
+                                        x-show="avatarPreview || data.user.avatar">
+                                        <i class="ri-image-edit-line me-2"></i>
+                                        Cambiar foto de perfil
+                                    </button>
+
+                                    <input type="file" 
+                                        x-ref="avatarInput"
+                                        @change="handleAvatarSelect($event)" 
+                                        accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                                        class="d-none">
+                                    
+                                    <span class="text-danger d-block mt-2" x-show="error.avatar" x-text="error.avatar"></span>
                                 </div>
+                            </div>
+
+                            <div class="col-lg-12 mb-4 text-center">
+                                <span class="text-danger" x-text="error.non_field_errors"></span>
+                                <span class="text-success" x-text="success"></span>
                             </div>
 
                             <div class="col-lg-12">
                                 <div class="d-flex gap-2">
-                                    <button type="button" class="btn btn-primary fw-normal text-white">Actualizar
-                                        perfil</button>
-                                    <button type="button" class="btn btn-danger fw-normal text-white"
-                                        data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="button" class="btn btn-danger fw-normal text-white" @click="window.location.href='/dashboard/profile'">
+                                        <i class="ri-close-line me-1"></i>
+                                        Cancelar
+                                    </button>
+                                    <button type="submit" class="btn btn-primary fw-normal text-white" :disabled="updating">
+                                        <span x-show="!updating">
+                                            <i class="ri-save-line me-1"></i>
+                                            Actualizar perfil
+                                        </span>
+                                        <span x-show="updating">
+                                            <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                                            Actualizando...
+                                        </span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -198,6 +297,8 @@
             {{>footer}}
         </div>
     </div>
+    <script type="module" src="/assets/js/actions/profile.js"></script>
     {{>scripts}}
 </body>
+
 </html>

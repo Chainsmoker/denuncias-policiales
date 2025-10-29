@@ -6,8 +6,6 @@ load_dotenv()
 
 API_KEY = os.getenv("API_KEY")
 
-print("API_KEY:", API_KEY)
-
 def validate_dni(dni):
     url = f"https://dniruc.apisperu.com/api/v1/dni/{dni}?token={API_KEY}"
     response = requests.get(url)

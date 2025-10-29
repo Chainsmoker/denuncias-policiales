@@ -28,7 +28,7 @@ class Auth extends ApiClient {
         else if (action === 'reset') {
             this.success = 'Contraseña restablecida exitosamente, por favor inicia sesión.';
         }
-        else if (action === 'updated') {
+        else if (action === 'password_changed') {
             this.success = 'Contraseña actualizada exitosamente, por favor inicia sesión.';
         }
     }
@@ -47,6 +47,7 @@ class Auth extends ApiClient {
             }
         } catch (error) {
             console.error('Login failed:', error);
+            this.error = { non_field_errors: ['Error al iniciar sesión. Por favor, verifica tus credenciales e intenta de nuevo.'] };
         } finally {
             this.loginForm = {
                 email: '',
@@ -69,15 +70,14 @@ class Auth extends ApiClient {
                 dni: this.registerForm.dni
             });
 
-
             if (success) {
                 window.location.href = `/accounts/login?action=register`;
             } else {
-                console.log( errors );
                 this.error = errors;
             }
         } catch (error) {
             console.error('Registration failed:', error);
+            this.error = { non_field_errors: ['Error al registrar la cuenta. Por favor, intenta de nuevo más tarde.'] };
         } finally {
             this.registerForm = {
                 email: '',

@@ -32,6 +32,8 @@ class Incidents extends ApiClient {
         this.evidenceToDelete = null;
         this.deletingEvidence = false;
         this.uploadingEvidence = false;
+        this.showFullscreenViewer = false;
+        this.currentEvidenceIndex = 0;
         this.currentUser = this.getCurrentUser();
     }
 
@@ -235,7 +237,7 @@ class Incidents extends ApiClient {
 
         } catch (error) {
             console.error('Error al guardar denuncia:', error);
-            alert('Error al guardar la denuncia');
+            this.error.non_field_errors = ['Error al guardar la denuncia, por favor intente nuevamente.'];
         } finally {
             this.saving = false;
         }
@@ -243,6 +245,7 @@ class Incidents extends ApiClient {
 
     openDeleteModal(incident) {
         this.incidentToDelete = incident;
+        this.error = {};
         const modal = new bootstrap.Modal(document.getElementById('deleteIncidentModal'));
         modal.show();
     }
@@ -264,7 +267,7 @@ class Incidents extends ApiClient {
             }
         } catch (error) {
             console.error('Error al eliminar denuncia:', error);
-            alert('Error al eliminar la denuncia');
+            this.error = { non_field_errors: ['Error al eliminar la denuncia, por favor intente nuevamente.'] };
         } finally {
             this.deleting = false;
             this.incidentToDelete = null;
@@ -497,6 +500,35 @@ class Incidents extends ApiClient {
 
     isVideo(evidence) {
         return evidence.file_type === 'video';
+    }
+
+    // Fullscreen Evidence Viewer Methods
+    showEvidenceFullscreen(index) {
+        this.currentEvidenceIndex = index;
+        this.showFullscreenViewer = true;
+        document.body.style.overflow = 'hidden';
+    }
+
+    closeEvidenceFullscreen() {
+        this.showFullscreenViewer = false;
+        this.currentEvidenceIndex = 0;
+        document.body.style.overflow = 'auto';
+    }
+
+    nextEvidence() {
+        if (this.currentEvidenceIndex < this.evidenceFiles.length - 1) {
+            this.currentEvidenceIndex++;
+        }
+    }
+
+    prevEvidence() {
+        if (this.currentEvidenceIndex > 0) {
+            this.currentEvidenceIndex--;
+        }
+    }
+
+    get currentEvidence() {
+        return this.evidenceFiles[this.currentEvidenceIndex] || null;
     }
 }
 

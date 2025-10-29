@@ -70,7 +70,20 @@
                                     <template x-for="incident in data.results" :key="incident.id">
                                         <tr>
                                             <td class="text-body" x-text="`#${incident.id}`"></td>
-                                            <td class="text-body" x-text="incident.user_name || 'N/A'"></td>
+                                            <td>
+                                                <a href="javascript:void(0);"
+                                                    class="d-flex align-items-center text-decoration-none">
+                                                    <div class="flex-shrink-0">
+                                                        <img :src="incident.avatar" class="rounded-circle"
+                                                            style="width: 50px; height: 50px;" alt="user1">
+                                                    </div>
+                                                    <div class="flex-grow-1 ms-12">
+                                                        <h3 class="fw-medium hover-text mb-0 fs-16"><span
+                                                                x-text="incident.full_name ? incident.full_name : 'N/A'"></span>
+                                                        </h3>
+                                                    </div>
+                                                </a>
+                                            </td>
                                             <td class="text-secondary" x-text="formatDate(incident.created_at)"></td>
                                             <td class="text-body" x-text="getTypeText(incident._type)"></td>
                                             <td class="text-body">
@@ -137,7 +150,7 @@
                                                 style="font-size: 48px;">delete_forever</i>
                                         </div>
                                     </div>
-                                    <h5 class="mb-3" style="color: #1e293b; font-weight: 600;">
+                                    <h5 class="mb-3" style="font-weight: 600;">
                                         ¿Estás seguro de eliminar esta denuncia?
                                     </h5>
                                     <p class="mb-2" style="color: #475569; font-size: 1rem;">
@@ -149,10 +162,13 @@
                                         permanentemente.
                                     </p>
                                 </div>
+                                <div class="col-lg-12 mb-4 text-center">
+                                    <span class="text-danger" x-text="error.non_field_errors"></span>
+                                </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary"
                                         data-bs-dismiss="modal">Cancelar</button>
-                                    <button type="button" class="btn btn-danger" @click="confirmDelete"
+                                    <button type="button" class="btn btn-danger text-white" @click="confirmDelete"
                                         :disabled="deleting">
                                         <span x-show="!deleting">
                                             <i class="material-symbols-outlined align-middle"
@@ -325,80 +341,99 @@
                                                             style="font-size: 20px; color: #0f79f3;">photo_library</i>
                                                         Evidencias (Imágenes o Videos)
                                                     </h6>
-                                                    
+
                                                     <div class="mb-3">
-                                                        <label for="evidenceFiles" class="btn btn-outline-secondary" style="cursor: pointer; border-radius: 10px;">
-                                                            <i class="material-symbols-outlined align-middle me-1" style="font-size: 18px;">upload_file</i>
+                                                        <label for="evidenceFiles" class="btn btn-outline-secondary"
+                                                            style="cursor: pointer; border-radius: 10px;">
+                                                            <i class="material-symbols-outlined align-middle me-1"
+                                                                style="font-size: 18px;">upload_file</i>
                                                             Seleccionar archivos
                                                         </label>
-                                                        <input type="file" class="d-none" id="evidenceFiles" 
-                                                            @change="handleFileSelect($event)" 
-                                                            accept="image/*,video/*" 
+                                                        <input type="file" class="d-none" id="evidenceFiles"
+                                                            @change="handleFileSelect($event)" accept="image/*,video/*"
                                                             multiple>
-                                                        
-                                                        <button type="button" 
-                                                            @click="uploadEvidenceOnly()" 
-                                                            class="btn btn-success ms-2" 
-                                                            style="border-radius: 10px;"
+
+                                                        <button type="button" @click="uploadEvidenceOnly()"
+                                                            class="btn btn-success ms-2" style="border-radius: 10px;"
                                                             x-show="editingIncident && hasNewEvidence"
                                                             :disabled="uploadingEvidence">
                                                             <span x-show="!uploadingEvidence">
-                                                                <i class="material-symbols-outlined align-middle me-1" style="font-size: 18px;">cloud_upload</i>
+                                                                <i class="material-symbols-outlined align-middle me-1"
+                                                                    style="font-size: 18px;">cloud_upload</i>
                                                                 Subir Evidencias
                                                             </span>
                                                             <span x-show="uploadingEvidence">
-                                                                <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                                                                <span class="spinner-border spinner-border-sm me-1"
+                                                                    role="status" aria-hidden="true"></span>
                                                                 Subiendo...
                                                             </span>
                                                         </button>
-                                                        
+
                                                         <small class="text-muted d-block mt-2">
-                                                            Formatos aceptados: JPG, PNG, GIF, WEBP, MP4, AVI, MOV, WMV, FLV, WEBM (Máx. 50MB por archivo)
+                                                            Formatos aceptados: JPG, PNG, GIF, WEBP, MP4, AVI, MOV, WMV,
+                                                            FLV, WEBM (Máx. 50MB por archivo)
                                                         </small>
                                                     </div>
 
                                                     <div class="row g-3" x-show="evidenceFiles.length > 0">
-                                                        <template x-for="(evidence, index) in evidenceFiles" :key="index">
+                                                        <template x-for="(evidence, index) in evidenceFiles"
+                                                            :key="index">
                                                             <div class="col-md-4">
-                                                                <div class="card border" style="border-radius: 10px; overflow: hidden;">
-                                                                    <div class="position-relative">
+                                                                <div class="card border"
+                                                                    style="border-radius: 10px; overflow: hidden;">
+                                                                    <div class="position-relative"
+                                                                        style="cursor: pointer;"
+                                                                        @click="showEvidenceFullscreen(index)">
                                                                         <template x-if="isImage(evidence)">
-                                                                            <img :src="evidence.file_url" 
-                                                                                class="card-img-top" 
-                                                                                style="height: 150px; object-fit: cover;" 
+                                                                            <img :src="evidence.file_url"
+                                                                                class="card-img-top"
+                                                                                style="height: 150px; object-fit: cover;"
                                                                                 :alt="evidence.name">
                                                                         </template>
                                                                         <template x-if="isVideo(evidence)">
-                                                                            <video :src="evidence.file_url" 
-                                                                                class="card-img-top" 
-                                                                                style="height: 150px; object-fit: cover;" 
+                                                                            <video :src="evidence.file_url"
+                                                                                class="card-img-top"
+                                                                                style="height: 150px; object-fit: cover;"
                                                                                 controls>
                                                                             </video>
                                                                         </template>
-                                                                        <button type="button" 
-                                                                            @click="removeEvidence(index)"
+                                                                        <button type="button"
+                                                                            @click.stop="removeEvidence(index)"
                                                                             class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2"
                                                                             style="border-radius: 50%; width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
-                                                                            <i class="material-symbols-outlined" style="font-size: 18px;">close</i>
+                                                                            <i class="material-symbols-outlined"
+                                                                                style="font-size: 18px;">close</i>
                                                                         </button>
+                                                                        <div
+                                                                            class="position-absolute bottom-0 start-0 w-100 p-2 text-white text-center"
+                                                                            style="background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); pointer-events: none;">
+                                                                            <i class="material-symbols-outlined"
+                                                                                style="font-size: 24px;">zoom_in</i>
+                                                                        </div>
                                                                     </div>
                                                                     <div class="card-body p-2">
-                                                                        <p class="mb-0 small text-truncate" x-text="evidence.name"></p>
-                                                                        <span class="badge bg-primary" x-text="evidence.file_type === 'image' ? 'Imagen' : 'Video'"></span>
+                                                                        <p class="mb-0 small text-truncate"
+                                                                            x-text="evidence.name"></p>
+                                                                        <span class="badge bg-primary"
+                                                                            x-text="evidence.file_type === 'image' ? 'Imagen' : 'Video'"></span>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </template>
                                                     </div>
 
-                                                    <div x-show="evidenceFiles.length === 0" class="text-center text-muted py-4" style="border: 2px dashed #dee2e6; border-radius: 10px;">
-                                                        <i class="material-symbols-outlined mb-2" style="font-size: 48px; opacity: 0.5;">photo_library</i>
+                                                    <div x-show="evidenceFiles.length === 0"
+                                                        class="text-center text-muted py-4"
+                                                        style="border: 2px dashed #dee2e6; border-radius: 10px;">
+                                                        <i class="material-symbols-outlined mb-2"
+                                                            style="font-size: 48px; opacity: 0.5;">photo_library</i>
                                                         <p class="mb-0">No se han agregado evidencias</p>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div class="col-12 mt-3" x-show="editingIncident">
+                                            <div class="col-12 mt-3"
+                                                x-show="editingIncident && $store.currentUser.is_superuser">
                                                 <label for="incidentStatus" class="form-label">
                                                     <i class="material-symbols-outlined align-middle me-1"
                                                         style="font-size: 18px; color: #64748b;">toggle_on</i>
@@ -416,7 +451,9 @@
                                     </form>
                                 </div>
 
-                                <span x-text="error.non_field_errors" class="text-danger text-center px-4"></span>
+                                <div class="col-lg-12 mb-4 text-center">
+                                    <span class="text-danger" x-text="error.non_field_errors"></span>
+                                </div>
 
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -424,8 +461,8 @@
                                             style="font-size: 18px;">close</i>
                                         Cancelar
                                     </button>
-                                    <button type="button" class="btn btn-primary" style="color: #fff;" @click="saveIncident"
-                                        :disabled="saving">
+                                    <button type="button" class="btn btn-primary" style="color: #fff;"
+                                        @click="saveIncident" :disabled="saving">
                                         <span x-show="!saving">
                                             <i class="material-symbols-outlined align-middle me-1"
                                                 style="font-size: 18px;" x-text="editingIncident ? 'check' : 'add'"></i>
@@ -442,6 +479,7 @@
                         </div>
                     </div>
 
+                    <!--
                     <div class="modal fade" id="deleteEvidenceModal" tabindex="-1"
                         aria-labelledby="deleteEvidenceModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered">
@@ -488,6 +526,104 @@
                                         </span>
                                     </button>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                    -->
+
+                    <!-- Fullscreen Evidence Viewer -->
+                    <div x-show="showFullscreenViewer" x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                        x-transition:leave="transition ease-in duration-200"
+                        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                        class="position-fixed top-0 start-0 w-100 h-100"
+                        style="z-index: 9999; background-color: rgba(0, 0, 0, 0.95);"
+                        @click="closeEvidenceFullscreen" @keydown.escape.window="closeEvidenceFullscreen"
+                        @keydown.arrow-left.window="prevEvidence" @keydown.arrow-right.window="nextEvidence">
+
+                        <!-- Close Button -->
+                        <button type="button" @click="closeEvidenceFullscreen"
+                            class="btn btn-light position-absolute top-0 end-0 m-3"
+                            style="z-index: 10001; border-radius: 50%; width: 48px; height: 48px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                            <i class="material-symbols-outlined" style="font-size: 28px;">close</i>
+                        </button>
+
+                        <!-- Evidence Counter -->
+                        <div class="position-absolute top-0 start-0 m-3 text-white" style="z-index: 10001;">
+                            <h5 class="mb-0">
+                                <span x-text="currentEvidenceIndex + 1"></span> /
+                                <span x-text="evidenceFiles.length"></span>
+                            </h5>
+                        </div>
+
+                        <!-- Main Content Area -->
+                        <div class="d-flex align-items-center justify-content-center h-100 w-100 p-5"
+                            @click.stop>
+                            <!-- Previous Button -->
+                            <button type="button" @click="prevEvidence"
+                                :disabled="currentEvidenceIndex === 0"
+                                class="btn btn-light me-3"
+                                style="border-radius: 50%; width: 56px; height: 56px; padding: 0; display: flex; align-items: center; justify-content: center; opacity: 0.9;"
+                                :style="currentEvidenceIndex === 0 ? 'opacity: 0.3; cursor: not-allowed;' : ''">
+                                <i class="material-symbols-outlined" style="font-size: 32px;">chevron_left</i>
+                            </button>
+
+                            <!-- Evidence Display -->
+                            <div class="flex-grow-1 h-100 d-flex align-items-center justify-content-center"
+                                style="max-width: 85%;">
+                                <template x-if="currentEvidence && isImage(currentEvidence)">
+                                    <img :src="currentEvidence.file_url" :alt="currentEvidence.name"
+                                        class="img-fluid"
+                                        style="max-height: 90vh; max-width: 100%; object-fit: contain; border-radius: 8px;">
+                                </template>
+                                <template x-if="currentEvidence && isVideo(currentEvidence)">
+                                    <video :src="currentEvidence.file_url" controls autoplay
+                                        class="img-fluid"
+                                        style="max-height: 90vh; max-width: 100%; border-radius: 8px;">
+                                    </video>
+                                </template>
+                            </div>
+
+                            <!-- Next Button -->
+                            <button type="button" @click="nextEvidence"
+                                :disabled="currentEvidenceIndex === evidenceFiles.length - 1"
+                                class="btn btn-light ms-3"
+                                style="border-radius: 50%; width: 56px; height: 56px; padding: 0; display: flex; align-items: center; justify-content: center; opacity: 0.9;"
+                                :style="currentEvidenceIndex === evidenceFiles.length - 1 ? 'opacity: 0.3; cursor: not-allowed;' : ''">
+                                <i class="material-symbols-outlined" style="font-size: 32px;">chevron_right</i>
+                            </button>
+                        </div>
+
+                        <!-- Bottom Info Bar -->
+                        <div class="position-absolute bottom-0 start-0 w-100 p-3 text-white text-center"
+                            style="z-index: 10001; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);">
+                            <p class="mb-1" x-text="currentEvidence?.name"></p>
+                            <span class="badge"
+                                :class="currentEvidence?.file_type === 'image' ? 'bg-primary' : 'bg-success'"
+                                x-text="currentEvidence?.file_type === 'image' ? 'Imagen' : 'Video'"></span>
+                        </div>
+
+                        <!-- Thumbnail Navigation -->
+                        <div class="position-absolute bottom-0 start-50 translate-middle-x mb-5 pb-3"
+                            style="z-index: 10001; max-width: 90%; overflow-x: auto;">
+                            <div class="d-flex gap-2 justify-content-center">
+                                <template x-for="(evidence, index) in evidenceFiles" :key="index">
+                                    <div @click.stop="showEvidenceFullscreen(index)"
+                                        class="border"
+                                        :class="index === currentEvidenceIndex ? 'border-primary border-3' : 'border-secondary'"
+                                        style="width: 80px; height: 80px; border-radius: 8px; overflow: hidden; cursor: pointer; flex-shrink: 0; transition: all 0.3s ease;"
+                                        :style="index === currentEvidenceIndex ? 'transform: scale(1.1); box-shadow: 0 4px 8px rgba(0,0,0,0.5);' : 'opacity: 0.6;'">
+                                        <template x-if="isImage(evidence)">
+                                            <img :src="evidence.file_url" :alt="evidence.name"
+                                                style="width: 100%; height: 100%; object-fit: cover;">
+                                        </template>
+                                        <template x-if="isVideo(evidence)">
+                                            <video :src="evidence.file_url"
+                                                style="width: 100%; height: 100%; object-fit: cover;">
+                                            </video>
+                                        </template>
+                                    </div>
+                                </template>
                             </div>
                         </div>
                     </div>

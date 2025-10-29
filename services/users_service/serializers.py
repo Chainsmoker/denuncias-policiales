@@ -3,6 +3,8 @@ from .models import User
 from django.contrib.auth.password_validation import validate_password
 
 class UserSerializer(serializers.ModelSerializer):
+    avatar = serializers.SerializerMethodField()
+    
     class Meta:
         model = User
         fields = [
@@ -12,9 +14,9 @@ class UserSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'date_joined']
         
-    def get_avatar_url(self, obj):
+    def get_avatar(self, obj):
         request = self.context.get('request')
-        if obj.avatar:
+        if obj.avatar and hasattr(obj.avatar, 'url'):
             if request is not None:
                 return request.build_absolute_uri(obj.avatar.url)
             return obj.avatar.url
@@ -41,11 +43,19 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'id', 'dni', 'email', 'first_name', 'last_name',
+            'id', 'dni', 'email', 'first_name', 'last_name', 'full_name',
             'phone', 'region', 'distrito', 'address', 'gender',
             'avatar', 'date_joined', 'is_active'
         ]
         read_only_fields = ['id', 'dni', 'date_joined', 'is_active']
+        
+    def get_avatar_url(self, obj):
+        request = self.context.get('request')
+        if obj.avatar:
+            if request is not None:
+                return request.build_absolute_uri(obj.avatar.url)
+            return obj.avatar.url
+        return None
 
 class UserProfileUpdateSerializer(serializers.ModelSerializer):
     class Meta:

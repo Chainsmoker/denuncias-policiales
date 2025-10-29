@@ -182,7 +182,7 @@ class Users extends ApiClient {
 
         } catch (error) {
             console.error('Error al guardar usuario:', error);
-            alert('Error al guardar el usuario');
+            this.error = { non_field_errors: ['Error al guardar el usuario, por favor intente nuevamente.'] };
         } finally {
             this.saving = false;
         }
@@ -190,6 +190,7 @@ class Users extends ApiClient {
 
     openDeleteModal(user) {
         this.userToDelete = user;
+        this.error = null;
         const modal = new bootstrap.Modal(document.getElementById('deleteUserModal'));
         modal.show();
     }
@@ -211,7 +212,7 @@ class Users extends ApiClient {
             }
         } catch (error) {
             console.error('Error al eliminar usuario:', error);
-            alert('Error al eliminar el usuario');
+            this.error = { non_field_errors: ['Error al eliminar el usuario, por favor intente nuevamente.'] };
         } finally {
             this.deleting = false;
             this.userToDelete = null;

@@ -1,6 +1,6 @@
 import ApiClient from './client.js';
 
-import { paths, endpoints } from './variables.js'
+import { endpoints } from './variables.js'
 
 class Dashboard extends ApiClient {
     constructor() {
@@ -20,7 +20,8 @@ class Dashboard extends ApiClient {
 
     async getDashboardStats() {
         try {
-            const { success, data } = await this.get(endpoints.reports);
+            const endpoint = Alpine.store('currentUser').is_superuser ? endpoints.reports : endpoints.myReports;
+            const { success, data } = await this.get(endpoint);
             if (success) {
                 this.data = data;
                 console.log(data);
@@ -29,29 +30,37 @@ class Dashboard extends ApiClient {
                 this.error = 'Failed to load dashboard statistics.';
             }
         } catch (error) {
-            console.error('Login failed:', error);
+            console.error('Error fetching dashboard statistics:', error);
         }
     }
 
     renderChart() {
-        const getTopSalesId = document.getElementById('total_denuncias_chart');
-        if (getTopSalesId) {
+        const denunciasChart = document.getElementById('total_denuncias_chart');
+        if (denunciasChart) {
+            denunciasChart.innerHTML = '';
+
+            const categories = this.data.chart_data.map(item => item.x);
+            const values = this.data.chart_data.map(item => item.y);
+            
             var options = {
                 series: [
                     {
-                        type: "line",
                         name: "Denuncias",
-                        data: this.data.chart_data
+                        data: values
                     }
                 ],
                 chart: {
                     height: 282,
                     type: "line",
                     animations: {
+                        enabled: true,
                         speed: 500
                     },
                     toolbar: {
                         show: false
+                    },
+                    zoom: {
+                        enabled: false
                     }
                 },
                 colors: [
@@ -65,6 +74,7 @@ class Dashboard extends ApiClient {
                     width: 3
                 },
                 xaxis: {
+                    categories: categories,
                     axisBorder: {
                         show: false,
                         color: '#e0e0e0'
@@ -82,44 +92,105 @@ class Dashboard extends ApiClient {
                     }
                 },
                 yaxis: {
-                    tickAmount: 3,
+                    tickAmount: 5,
+                    min: 0,
                     labels: {
                         style: {
                             colors: "#919aa3",
                             fontSize: "14px",
                             fontFamily: 'Outfit',
+                        },
+                        formatter: function(value) {
+                            return Math.floor(value);
                         }
                     }
                 },
                 legend: {
-                    position: "top",
-                    fontSize: "14px",
-                    fontFamily: 'Outfit',
-                    labels: {
-                        colors: "#919aa3",
-                    },
-                    itemMargin: {
-                        horizontal: 12,
-                        vertical: 0
-                    }
+                    show: false
                 },
                 markers: {
-                    size: 4,
+                    size: 5,
                     colors: ["#796df6"],
+                    strokeColors: "#fff",
                     strokeWidth: 2,
                     hover: {
-                        sizeOffset: 2
+                        size: 7
                     }
                 },
                 grid: {
                     strokeDashArray: 5,
-                    borderColor: "#e0e0e0"
+                    borderColor: "#e0e0e0",
+                    row: {
+                        colors: ['transparent', 'transparent'],
+                        opacity: 0.5
+                    }
+                },
+                tooltip: {
+                    enabled: true,
+                    theme: 'light',
+                    y: {
+                        formatter: function(value) {
+                            return value + " denuncias";
+                        }
+                    }
                 }
             };
 
             var chart = new ApexCharts(document.querySelector("#total_denuncias_chart"), options);
             chart.render();
         }
+    }
+
+    getStatusBadgeClass(status) {
+        const classes = {
+            'Pending': 'text-warning bg-warning',
+            'In Progress': 'text-primary bg-primary',
+            'Resolved': 'text-success bg-success'
+        };
+        return classes[status] || 'text-secondary bg-secondary';
+    }
+
+    getStatusText(status) {
+        const texts = {
+            'Pending': 'Pendiente',
+            'In Progress': 'En Progreso',
+            'Resolved': 'Resuelto'
+        };
+        return texts[status] || status;
+    }
+
+    getTypeText(type) {
+        const types = {
+            'accident': 'Accidente de tránsito',
+            'theft': 'Robo o hurto',
+            'assault': 'Agresión o violencia física',
+            'domestic_violence': 'Violencia familiar o de pareja',
+            'fraud': 'Estafa o fraude',
+            'missing_person': 'Persona desaparecida',
+            'vandalism': 'Vandalismo o daños a la propiedad',
+            'drug_trafficking': 'Tráfico o consumo de drogas',
+            'homicide': 'Homicidio o intento de homicidio',
+            'harassment': 'Acoso o amenazas',
+            'cybercrime': 'Delito informático',
+            'sexual_abuse': 'Abuso o acoso sexual',
+            'weapon_possession': 'Tenencia ilegal de armas',
+            'public_disturbance': 'Alteración del orden público',
+            'child_abuse': 'Maltrato infantil',
+            'animal_abuse': 'Maltrato animal',
+            'property_dispute': 'Conflicto por propiedad',
+            'corruption': 'Corrupción o soborno',
+            'kidnapping': 'Secuestro o tentativa',
+            'other': 'Otro tipo de denuncia'
+        };
+        return types[type] || type;
+    }
+
+    formatDate(dateString) {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
     }
 }
 

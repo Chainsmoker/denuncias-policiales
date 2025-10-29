@@ -1,4 +1,4 @@
-<header class="header-area bg-white mb-4 rounded-10 border border-white" id="header-area" x-data="currentUser">
+<header class="header-area bg-white mb-4 rounded-10 border border-white" id="header-area">
     <div class="row align-items-center">
         <div class="col-md-6">
             <div class="left-header-content">
@@ -76,12 +76,15 @@
                         </div>
                     </li>
                     <li class="header-right-item">
-                        <div class="dropdown admin-profile">
+                        <div class="dropdown admin-profile" x-data>
                             <div class="d-xxl-flex align-items-center bg-transparent border-0 text-start p-0 cursor dropdown-toggle"
                                 data-bs-toggle="dropdown">
                                 <div class="flex-shrink-0 position-relative">
                                     <img class="rounded-circle admin-img-width-for-mobile user-avatar" 
-                                        style="width: 40px; height: 40px;" :src="avatar" alt="admin">
+                                        style="width: 40px; height: 40px; object-fit: cover;" 
+                                        :src="$store.currentUser.avatar || '/assets/images/default-avatar.png'" 
+                                        alt="admin"
+                                        @error="$el.src='/assets/images/default-avatar.png'">
                                 </div>
                             </div>
 
@@ -89,12 +92,14 @@
                                 <div class="d-flex align-items-center info">
                                     <div class="flex-shrink-0">
                                         <img class="rounded-circle admin-img-width-for-mobile user-avatar"
-                                            style="width: 40px; height: 40px;" :src="avatar"
-                                            alt="admin">
+                                            style="width: 40px; height: 40px; object-fit: cover;" 
+                                            :src="$store.currentUser.avatar || '/assets/images/default-avatar.png'"
+                                            alt="admin"
+                                            @error="$el.src='/assets/images/default-avatar.png'">
                                     </div>
                                     <div class="flex-grow-1 ms-10">
-                                        <h3 class="fw-medium fs-17 mb-0" x-text="full_name"></h3>
-                                        <span class="fs-15 fw-medium" x-text="isSuperuser ? 'Autoridad' : 'Usuario'"></span>
+                                        <h3 class="fw-medium fs-17 mb-0" x-text="$store.currentUser.full_name || 'Usuario'"></h3>
+                                        <span class="fs-15 fw-medium" x-text="$store.currentUser.is_superuser ? 'Autoridad' : 'Usuario'"></span>
                                     </div>
                                 </div>
                                 <ul class="admin-link mb-0 list-unstyled">

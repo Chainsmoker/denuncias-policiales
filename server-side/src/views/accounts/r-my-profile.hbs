@@ -8,7 +8,7 @@
 <body class="bg-body-bg">
     {{> preloader }}
     {{> sidebar }}
-    <div class="container-fluid">
+    <div class="container-fluid" x-data="profile">
         <div class="main-content d-flex flex-column">
             {{>header}}
             <div class="main-content-container overflow-hidden">
@@ -46,21 +46,17 @@
                                 <div class="d-flex align-items-end">
                                     <div class="flex-shrink-0 position-relative">
                                         <div class="avatar-upload">
-                                            <div class="avatar-edit" data-bs-toggle="tooltip" data-bs-placement="top"
-                                                data-bs-title="Tamaño (190x190)">
-                                                <input type='file' id="imageUpload" accept=".png, .jpg, .jpeg" />
-                                                <label for="imageUpload"></label>
-                                            </div>
                                             <div class="avatar-preview">
                                                 <div id="imagePreview"
-                                                    style="background-image: url(https://angular.hibootstrap.com/daxa/images/profile.jpg);">
+                                                    :style="`background-image: url(${data.user.avatar});`">
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="flex-grow-1 ms-20 mb-45">
-                                        <h3 class="mb-1">Juan Perez</h3>
-                                        <span class="fs-16"><a href="javascript:void(0);">juancitoperez@gmail.com</a></span>
+                                        <h3 class="mb-1" x-text="data.user.full_name"></h3>
+                                        <span class="fs-16"><a href="javascript:void(0);"
+                                                x-text="data.user.email"></a></span>
                                     </div>
                                 </div>
                             </div>
@@ -85,16 +81,22 @@
                         <div class="card bg-white border border-white rounded-10 p-20 mb-4">
                             <h3 class="mb-20">Información</h3>
                             <ul class="p-0 mb-0 list-unstyled last-child-none">
-                                <li class="mb-10 fs-16">ID: <span class="text-secondary">7001</span></li>
-                                <li class="mb-10 fs-16">Nombre Completo: <span class="text-secondary">Juan Perez</span>
+                                <li class="mb-10 fs-16">ID: <span class="text-secondary"
+                                        x-text="`#${data.user.id}`"></span></li>
+                                <li class="mb-10 fs-16">Nombre Completo: <span class="text-secondary"
+                                        x-text="data.user.full_name"></span>
                                 </li>
                                 <li class="mb-10 fs-16">Correo Electrónico: <span class="text-secondary"><a
-                                            href="mailto:juancitoperez@gmail.com">juancitoperez@gmail.com</a></span>
+                                            :href="`mailto:${data.user.email}`" x-text="data.user.email"></a></span>
                                 </li>
-                                <li class="mb-10 fs-16">Rol: <span class="text-secondary">Usuario</span></li>
-                                <li class="mb-10 fs-16">Ubicación: <span class="text-secondary">Comas, Lima</span>
+                                <li class="mb-10 fs-16">Rol: <span class="text-secondary"
+                                        x-text="data.user.is_superuser ? 'Autoridad' : 'Usuario'"></span></li>
+                                <li class="mb-10 fs-16">Ubicación: <span class="text-secondary"
+                                        x-text="getUserAddress()"></span>
                                 </li>
-                                <li class="mb-10 fs-16">Fecha de Registro: <span class="text-secondary">Octubre 10, 2025</span></li>
+                                <li class="mb-10 fs-16">Fecha de Registro: <span class="text-secondary"
+                                        x-text="new Date(data.user.date_joined).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })"></span>
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -112,20 +114,41 @@
                                                 <th scope="col" class="fw-medium">ID</th>
                                                 <th scope="col" class="fw-medium">Usuario</th>
                                                 <th scope="col" class="fw-medium">Fecha</th>
+                                                <th scope="col" class="fw-medium">Tipo</th>
                                                 <th scope="col" class="fw-medium">Descripción</th>
                                                 <th scope="col" class="fw-medium">Distrito</th>
                                                 <th scope="col" class="fw-medium">Estado</th>
-                                                <th scope="col" class="fw-medium">Acción</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {{> incidents/incident-row }}
-                                            {{> incidents/incident-row }}
+                                            <template x-for="incident in data.recentIncidents" :key="incident.id">
+                                                <tr>
+                                                    <td class="text-body" x-text="`#${incident.id}`"></td>
+                                                    <td class="text-body" x-text="incident.full_name || 'N/A'"></td>
+                                                    <td class="text-secondary" x-text="formatDate(incident.created_at)">
+                                                    </td>
+                                                    <td class="text-body" x-text="getTypeText(incident._type)"></td>
+                                                    <td class="text-body">
+                                                        <span
+                                                            x-text="incident.description.length > 50 ? incident.description.substring(0, 30) + '...' : incident.description"></span>
+                                                    </td>
+                                                    <td class="text-body" x-text="incident.district"></td>
+                                                    <td>
+                                                        <span style="width: 110px;text-align: center;"
+                                                            :class="`${getStatusBadgeClass(incident.status)} bg-opacity-10 fs-15 fw-normal d-inline-block default-badge`"
+                                                            x-text="getStatusText(incident.status)">
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </template>
+                                            <tr x-show="data.recentIncidents.length === 0">
+                                                <td colspan="8" class="text-center text-body py-5">No se encontraron
+                                                    denuncias.
+                                                </td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
-
-                                {{> paginator }}
                             </div>
                         </div>
 
@@ -144,7 +167,8 @@
                                                 <div class="flex-grow-1 ms-12 position-relative top-2">
                                                     <h6 class="fs-16 fw-medium mb-1" style="margin-bottom: 2.5px;">
                                                         Juan Perez</h6>
-                                                    <span class="fs-14 text-body d-block mb-1">10 de Octubre, 2025 (09:30 AM)</span>
+                                                    <span class="fs-14 text-body d-block mb-1">10 de Octubre, 2025
+                                                        (09:30 AM)</span>
                                                     <p class="fs-16">Juan Perez ha creado una nueva denuncia.</p>
                                                 </div>
                                             </div>
@@ -162,6 +186,7 @@
             {{>footer}}
         </div>
     </div>
+    <script type="module" src="/assets/js/actions/profile.js"></script>
     {{>scripts}}
 </body>
 

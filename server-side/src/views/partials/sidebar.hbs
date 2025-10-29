@@ -28,7 +28,7 @@
                 </a>
             </li>
 
-            <li class="menu-item">
+            <li class="menu-item" x-show="$store.currentUser.is_superuser">
                 <a href="/dashboard/incidents/map" class="menu-link">
                     <span class="material-symbols-outlined menu-icon">map</span>
                     <span class="title">Mapa</span>
@@ -39,7 +39,7 @@
                 <span class="menu-title-text">usuarios</span>
             </li>
 
-            <li class="menu-item">
+            <li class="menu-item" x-show="$store.currentUser.is_superuser">
                 <a href="/dashboard/users" class="menu-link">
                     <span class="material-symbols-outlined menu-icon">people</span>
                     <span class="title">Usuarios</span>

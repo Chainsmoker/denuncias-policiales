@@ -9,6 +9,7 @@ export const endpoints = {
 
     // Dashboard
     reports: `${paths.apiPath}/dashboard/stats/`,
+    myReports: `${paths.apiPath}/dashboard/my-stats/`,
 
     // Users
     users: `${paths.apiPath}/users/`,
@@ -18,4 +19,9 @@ export const endpoints = {
     createIncident: `${paths.apiPath}/incidents/create/`,
     updateIncident: `${paths.apiPath}/incidents/update/`,
     heatmap: `${paths.apiPath}/incidents/heatmap/`,
+
+    // Profile 
+    profile: `${paths.apiPath}/profile/`,
+    updateProfile: `${paths.apiPath}/profile/update/`,
+    changePassword: `${paths.apiPath}/profile/change-password/`,
 }

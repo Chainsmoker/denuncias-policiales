@@ -55,8 +55,9 @@ class DenunciaCreateUpdateSerializer(serializers.ModelSerializer):
 
 
 class DenunciaListSerializer(serializers.ModelSerializer):
+    avatar = serializers.SerializerMethodField()
     user_email = serializers.EmailField(source='user.email', read_only=True)
-    user_name = serializers.SerializerMethodField()
+    full_name = serializers.SerializerMethodField()
     user_id = serializers.IntegerField(source='user.id', read_only=True)
     _type_display = serializers.CharField(source='get__type_display', read_only=True)
     evidence_count = serializers.SerializerMethodField()
@@ -64,16 +65,23 @@ class DenunciaListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Denuncia
         fields = [
-            'id', 'user_email', 'user_name', 'user_id', 'description', 'created_at',
-            'district', 'region', 'lat', 'lon', '_type', '_type_display', 'status', 'evidence_count'
+            'id', 'user_email', 'full_name', 'user_id', 'description', 'created_at',
+            'district', 'region', 'lat', 'lon', '_type', '_type_display', 'status', 'evidence_count', 'avatar'
         ]
     
-    def get_user_name(self, obj):
-        return f"{obj.user.first_name} {obj.user.last_name}"
+    def get_full_name(self, obj):
+        return obj.user.full_name
     
     def get_evidence_count(self, obj):
         return obj.evidence.count()
-
+    
+    def get_avatar(self, obj):
+        request = self.context.get('request')
+        if obj.user.avatar and hasattr(obj.user.avatar, 'url'):
+            if request:
+                return request.build_absolute_uri(obj.user.avatar.url)
+            return obj.user.avatar.url
+        return None
 
 class DenunciaStatusUpdateSerializer(serializers.ModelSerializer):
     class Meta:
