@@ -35,7 +35,7 @@
                 </a>
             </li>
 
-            <li class="menu-title small text-uppercase">
+            <li class="menu-title small text-uppercase" x-show="$store.currentUser.is_superuser">
                 <span class="menu-title-text">usuarios</span>
             </li>
 
@@ -43,13 +43,6 @@
                 <a href="/dashboard/users" class="menu-link">
                     <span class="material-symbols-outlined menu-icon">people</span>
                     <span class="title">Usuarios</span>
-                </a>
-            </li>
-
-            <li class="menu-item">
-                <a href="/dashboard/chat" class="menu-link">
-                    <span class="material-symbols-outlined menu-icon">chat</span>
-                    <span class="title">Chat</span>
                 </a>
             </li>
 
