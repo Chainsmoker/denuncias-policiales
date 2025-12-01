@@ -145,8 +145,8 @@ class Profile extends ApiClient {
                     Alpine.store('currentUser').update(data.user);
                 }
             
-                window.location.href = '/dashboard/profile';
-                //this.success = 'Perfil actualizado correctamente!';
+                //window.location.href = '/dashboard/profile';
+                this.success = 'Perfil actualizado correctamente!';
             } else {
                 this.error = data;
                 alert('Error al actualizar el perfil: ' + (data.detail || 'Error desconocido'));

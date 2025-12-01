@@ -62,8 +62,9 @@ class UserProfileUpdateSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'first_name', 'last_name', 'phone', 'region',
-            'distrito', 'address', 'gender', 'email', 'avatar'
+            'distrito', 'address', 'gender', 'email', 'avatar', 'is_active', 'is_staff', 'is_superuser'
         ]
+        read_only_fields = ['is_active', 'is_staff', 'is_superuser']
         
     def validate_email(self, value):
         user = self.instance

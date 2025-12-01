@@ -91,7 +91,12 @@
 
                                     <div class="mb-4">
                                         <button type="button" class="btn btn-primary fw-normal text-white w-100"
-                                            style="padding-top: 18px; padding-bottom: 18px;" @click="register">Registrarse</button>
+                                            style="padding-top: 18px; padding-bottom: 18px;" @click="register">
+                                            <span x-show="!loading">Registrarse</span>
+                                            <span x-show="loading">
+                                                <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                                            </span> 
+                                        </button>
                                     </div>
 
                                 </form>

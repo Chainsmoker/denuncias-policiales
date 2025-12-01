@@ -1,3 +1,4 @@
+import requests
 from django.contrib.auth import authenticate, login, logout
 from rest_framework import status
 from rest_framework.views import APIView
@@ -20,6 +21,11 @@ class UserRegistrationView(APIView):
             user = serializer.save()
             token, _ = Token.objects.get_or_create(user=user)
             user_data = UserSerializer(user).data
+
+            requests.post(
+                "http://notification_service:3001/send-email",
+                json={"email": user.email, "subject": "Bienvenido a Roadify!", "message": f"Hola {user.first_name}, gracias por registrarte en Roadify."},
+            )
 
             return Response(
                 {
